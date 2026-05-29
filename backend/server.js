@@ -19,12 +19,20 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.log('MongoDB connection error:', err));
+if (!process.env.MONGODB_URI) {
+  console.error('FATAL ERROR: MONGODB_URI environment variable is not defined.');
+  // Return a 500 error middleware to all routes if MongoDB URI is missing
+  app.use((req, res) => {
+    res.status(500).json({ error: 'Database configuration missing on server (MONGODB_URI is not set)' });
+  });
+} else {
+  mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log('MongoDB connection error:', err));
+}
 
 // Routes
 app.use('/api/submissions', require('./routes/submissions'));
