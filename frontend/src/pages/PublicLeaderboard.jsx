@@ -55,6 +55,27 @@ const PublicLeaderboard = () => {
             <p className="text-gray-600">Danh sách những người đã gửi điểm</p>
           </div>
 
+          {adminPosts.length > 0 && (
+            <div className="mb-8">
+              <div className="mb-4 text-center">
+                <h2 className="text-2xl font-bold text-gray-800">Bài đăng từ Admin</h2>
+              </div>
+              <div className="flex flex-col items-center gap-6">
+                {adminPosts.map((post) => (
+                  <div key={post._id} className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <div className="aspect-[16/9] bg-gray-100">
+                      <img
+                        src={post.file?.url}
+                        alt={post.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Search */}
           <div className="bg-white rounded-lg shadow p-6 mb-6">
             <form onSubmit={handleSearch} className="flex gap-2">
@@ -80,37 +101,6 @@ const PublicLeaderboard = () => {
               </button>
             </form>
           </div>
-
-          {adminPosts.length > 0 && (
-            <div className="mb-8">
-              <div className="mb-4 text-center">
-                <h2 className="text-2xl font-bold text-gray-800">Bài đăng từ Admin</h2>
-                <p className="text-gray-600">Hình ảnh admin gửi sẽ hiển thị ở đây</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {adminPosts.map((post) => (
-                  <div key={post._id} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                    <div className="aspect-[16/10] bg-gray-100">
-                      <img
-                        src={post.file?.url}
-                        alt={post.name}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div className="p-4 flex items-center justify-between gap-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">{post.name}</h3>
-                        <p className="text-sm text-gray-500">
-                          {new Date(post.createdAt).toLocaleDateString('vi-VN')}
-                        </p>
-                      </div>
-                      <span className="text-sm font-bold text-blue-600">{post.score}/500</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Table */}
           <div className="bg-white rounded-lg shadow overflow-hidden">
