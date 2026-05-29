@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 
     const submissions = await Submission.find({ isAdminPost: { $ne: true } })
       .select('name score createdAt status file isAdminPost')
-      .sort({ createdAt: -1 })
+      .sort({ score: -1, createdAt: -1 })
       .limit(parseInt(limit))
       .skip(skip);
 
