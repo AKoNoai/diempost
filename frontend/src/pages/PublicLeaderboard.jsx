@@ -10,6 +10,7 @@ const PublicLeaderboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     fetchSubmissions();
@@ -63,11 +64,14 @@ const PublicLeaderboard = () => {
               <div className="flex flex-col items-center gap-6">
                 {adminPosts.map((post) => (
                   <div key={post._id} className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                    <div className="aspect-[16/9] bg-gray-100">
+                    <div 
+                      className="aspect-[16/9] bg-gray-100 cursor-pointer group"
+                      onClick={() => setSelectedImage(post.file?.url)}
+                    >
                       <img
                         src={post.file?.url}
                         alt={post.name}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover group-hover:opacity-90 transition-opacity"
                       />
                     </div>
                   </div>
@@ -138,13 +142,16 @@ const PublicLeaderboard = () => {
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-600">
                             {sub.file?.url && sub.file?.fileType?.startsWith('image/') ? (
-                              <a href={sub.file.url} target="_blank" rel="noreferrer">
+                              <div 
+                                className="cursor-pointer"
+                                onClick={() => setSelectedImage(sub.file.url)}
+                              >
                                 <img
                                   src={sub.file.url}
                                   alt={sub.name}
-                                  className="h-14 w-14 rounded-lg object-cover border border-gray-200 shadow-sm"
+                                  className="h-14 w-14 rounded-lg object-cover border border-gray-200 shadow-sm hover:opacity-80 transition"
                                 />
-                              </a>
+                              </div>
                             ) : (
                               <span>-</span>
                             )}
@@ -176,13 +183,16 @@ const PublicLeaderboard = () => {
                         <div>
                           <p className="text-gray-500">Hình ảnh</p>
                           {sub.file?.url && sub.file?.fileType?.startsWith('image/') ? (
-                            <a href={sub.file.url} target="_blank" rel="noreferrer">
+                            <div 
+                              className="cursor-pointer mt-1"
+                              onClick={() => setSelectedImage(sub.file.url)}
+                            >
                               <img
                                 src={sub.file.url}
                                 alt={sub.name}
-                                className="h-16 w-16 rounded-lg object-cover border border-gray-200 shadow-sm mt-1"
+                                className="h-16 w-16 rounded-lg object-cover border border-gray-200 shadow-sm hover:opacity-80 transition"
                               />
-                            </a>
+                            </div>
                           ) : (
                             <p>-</p>
                           )}
@@ -227,6 +237,29 @@ const PublicLeaderboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-5xl w-full h-full flex flex-col items-center justify-center">
+            <button 
+              className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-50 bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center pb-1"
+              onClick={() => setSelectedImage(null)}
+            >
+              &times;
+            </button>
+            <img 
+              src={selectedImage} 
+              alt="Phóng to" 
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };
