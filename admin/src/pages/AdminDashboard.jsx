@@ -60,6 +60,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ total: 0, approved: 0 });
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [selectedSubmissionIds, setSelectedSubmissionIds] = useState([]);
   const [pokemonWeek, setPokemonWeek] = useState(4);
   const [pokemonLoading, setPokemonLoading] = useState(false);
   const [pokemonError, setPokemonError] = useState('');
@@ -162,6 +163,37 @@ const AdminDashboard = () => {
       fetchSubmissions();
       fetchStats();
     } catch (error) {
+      toast.error('Lỗi xóa dữ liệu');
+    }
+  };
+
+  const handleToggleSubmission = (submissionId) => {
+    setSelectedSubmissionIds((current) =>
+      current.includes(submissionId)
+        ? current.filter((id) => id !== submissionId)
+        : [...current, submissionId]
+    );
+  };
+
+  const handleSelectAllVisible = (submissionList) => {
+    const visibleIds = submissionList.map((submission) => submission._id);
+    const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedSubmissionIds.includes(id));
+
+    setSelectedSubmissionIds(allSelected ? [] : visibleIds);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedSubmissionIds.length === 0) return;
+    if (!window.confirm(`Bạn chắc chắn muốn xóa ${selectedSubmissionIds.length} mục đã chọn?`)) return;
+
+    try {
+      await Promise.allSettled(selectedSubmissionIds.map((id) => adminAPI.deleteSubmission(token, id)));
+      toast.success('Đã xóa các mục đã chọn');
+      setSelectedSubmissionIds([]);
+      fetchSubmissions();
+      fetchStats();
+    } catch (error) {
+      console.error('Bulk delete error:', error);
       toast.error('Lỗi xóa dữ liệu');
     }
   };
@@ -297,6 +329,10 @@ const AdminDashboard = () => {
     navigate('/login');
   };
 
+  const visibleSubmissions = submissions.filter((submission) => !isPokemonSubmissionName(submission.name, pokemonWeeks));
+  const allVisibleSelected = visibleSubmissions.length > 0
+    && visibleSubmissions.every((submission) => selectedSubmissionIds.includes(submission._id));
+
   return (
     <>
       <Toaster position="top-center" />
@@ -413,6 +449,30 @@ const AdminDashboard = () => {
                   >
                     Approved
                   </button>
+
+                  {visibleSubmissions.length > 0 ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectAllVisible(visibleSubmissions)}
+                        className={`px-4 py-2 rounded-lg transition text-sm sm:text-base ${allVisibleSelected
+                            ? 'bg-emerald-500 text-white'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          }`}
+                      >
+                        {allVisibleSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleBulkDelete}
+                        disabled={selectedSubmissionIds.length === 0}
+                        className="px-4 py-2 rounded-lg transition text-sm sm:text-base bg-red-500 text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-red-300"
+                      >
+                        Xóa đã chọn ({selectedSubmissionIds.length})
+                      </button>
+                    </>
+                  ) : null}
                 </div>
               </div>
 
@@ -424,13 +484,21 @@ const AdminDashboard = () => {
                     </div>
                     <p className="text-gray-600">Đang tải...</p>
                   </div>
-                ) : submissions.filter((submission) => !isPokemonSubmissionName(submission.name, pokemonWeeks)).length === 0 ? (
+                ) : visibleSubmissions.length === 0 ? (
                   <div className="p-8 text-center text-gray-500">Không có dữ liệu</div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-gray-50 border-b">
                         <tr>
+                          <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700 w-12">
+                            <input
+                              type="checkbox"
+                              checked={allVisibleSelected}
+                              onChange={() => handleSelectAllVisible(visibleSubmissions)}
+                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                          </th>
                           <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">Tên Game</th>
                           <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">Điểm</th>
                           <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-gray-700">Status</th>
@@ -439,10 +507,16 @@ const AdminDashboard = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {submissions
-                          .filter((submission) => !isPokemonSubmissionName(submission.name, pokemonWeeks))
-                          .map((submission) => (
+                        {visibleSubmissions.map((submission) => (
                           <tr key={submission._id} className="hover:bg-gray-50 transition">
+                            <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm">
+                              <input
+                                type="checkbox"
+                                checked={selectedSubmissionIds.includes(submission._id)}
+                                onChange={() => handleToggleSubmission(submission._id)}
+                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              />
+                            </td>
                             <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-800">{submission.name}</td>
                             <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm font-semibold text-gray-800">{submission.score}</td>
                             <td className="px-4 sm:px-6 py-4 text-xs sm:text-sm">
