@@ -34,7 +34,10 @@ const PublicLeaderboard = () => {
   const fetchAdminPosts = async () => {
     try {
       const response = await submissionsAPI.getAdminPosts(8);
-      setAdminPosts(response.data.data || []);
+      const posts = (response.data.data || []).filter((post) =>
+        String(post.name || '').toLowerCase().includes('poster')
+      );
+      setAdminPosts(posts);
     } catch (error) {
       console.error('Fetch admin posts error:', error);
     }
@@ -59,23 +62,25 @@ const PublicLeaderboard = () => {
           {adminPosts.length > 0 && (
             <div className="mb-8">
               <div className="mb-4 text-center">
-                <h2 className="text-2xl font-bold text-gray-800">Bài đăng từ Admin</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Poster từ Admin</h2>
               </div>
-              <div className="flex flex-col items-center gap-6">
-                {adminPosts.map((post) => (
-                  <div key={post._id} className="w-full max-w-3xl bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                    <div 
-                      className="aspect-[16/9] bg-gray-100 cursor-pointer group"
-                      onClick={() => setSelectedImage(post.file?.url)}
-                    >
-                      <img
-                        src={post.file?.url}
-                        alt={post.name}
-                        className="h-full w-full object-cover group-hover:opacity-90 transition-opacity"
-                      />
+              <div className="flex justify-center">
+                <div className="grid w-full max-w-4xl gap-6">
+                  {adminPosts.map((post) => (
+                    <div key={post._id} className="overflow-hidden rounded-3xl bg-white shadow-2xl border border-gray-100 mx-auto w-full max-w-4xl">
+                      <div
+                        className="aspect-[21/9] bg-gray-100 cursor-pointer"
+                        onClick={() => setSelectedImage(post.file?.url)}
+                      >
+                        <img
+                          src={post.file?.url}
+                          alt={post.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -142,7 +147,7 @@ const PublicLeaderboard = () => {
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-600">
                             {sub.file?.url && sub.file?.fileType?.startsWith('image/') ? (
-                              <div 
+                              <div
                                 className="cursor-pointer"
                                 onClick={() => setSelectedImage(sub.file.url)}
                               >
@@ -183,7 +188,7 @@ const PublicLeaderboard = () => {
                         <div>
                           <p className="text-gray-500">Hình ảnh</p>
                           {sub.file?.url && sub.file?.fileType?.startsWith('image/') ? (
-                            <div 
+                            <div
                               className="cursor-pointer mt-1"
                               onClick={() => setSelectedImage(sub.file.url)}
                             >
@@ -217,11 +222,10 @@ const PublicLeaderboard = () => {
                 <button
                   key={i + 1}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-4 py-2 rounded-lg transition text-sm ${
-                    currentPage === i + 1
+                  className={`px-4 py-2 rounded-lg transition text-sm ${currentPage === i + 1
                       ? 'bg-blue-500 text-white'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                 >
                   {i + 1}
                 </button>
@@ -240,20 +244,20 @@ const PublicLeaderboard = () => {
 
       {/* Image Modal */}
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-5xl w-full h-full flex flex-col items-center justify-center">
-            <button 
+            <button
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-50 bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center pb-1"
               onClick={() => setSelectedImage(null)}
             >
               &times;
             </button>
-            <img 
-              src={selectedImage} 
-              alt="Phóng to" 
+            <img
+              src={selectedImage}
+              alt="Phóng to"
               className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default"
               onClick={(e) => e.stopPropagation()}
             />

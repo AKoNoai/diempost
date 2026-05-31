@@ -1,9 +1,15 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.MODE === 'production' ? 'https://diempost-back.vercel.app/api' : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+const POKEMON_API_URL = 'https://thangtinshop.com/api';
 
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 10000,
+});
+
+const pokemonApi = axios.create({
+  baseURL: POKEMON_API_URL,
   timeout: 10000,
 });
 
@@ -28,7 +34,7 @@ api.interceptors.response.use((response) => {
 });
 
 export const adminAPI = {
-  login: (email, password) => 
+  login: (email, password) =>
     api.post('/admin/login', { email, password }),
   createSubmission: (data) =>
     api.post('/submissions', data),
@@ -60,6 +66,10 @@ export const adminAPI = {
     api.get('/admin/stats', {
       headers: { Authorization: `Bearer ${token}` }
     })
+};
+
+export const pokemonAPI = {
+  getWeek: (week) => pokemonApi.get('/pokemon/search', { params: { week } }),
 };
 
 export default api;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import { FiUpload, FiSend, FiList } from 'react-icons/fi';
+import { FiUpload, FiSend, FiList, FiCalendar } from 'react-icons/fi';
 import { submissionsAPI } from '../services/api';
 
 const UserSubmission = () => {
@@ -74,7 +74,13 @@ const UserSubmission = () => {
         <nav className="bg-white shadow-md">
           <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <h2 className="text-lg font-bold text-gray-800">Gửi Điểm</h2>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                onClick={() => navigate('/pokemon')}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg flex items-center gap-1 transition text-sm sm:text-base"
+              >
+                <FiCalendar /> Lịch x10 Poke
+              </button>
               <button
                 onClick={() => navigate('/leaderboard')}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center gap-1 transition text-sm sm:text-base"
