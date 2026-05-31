@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiRefreshCw, FiSearch } from 'react-icons/fi';
 import toast, { Toaster } from 'react-hot-toast';
 import { submissionsAPI } from '../services/api';
 
 const PublicLeaderboard = () => {
+  const navigate = useNavigate();
   const [submissions, setSubmissions] = useState([]);
   const [adminPosts, setAdminPosts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -53,6 +55,23 @@ const PublicLeaderboard = () => {
       <Toaster position="top-center" />
       <div className="min-h-screen bg-gray-100 py-8 px-4">
         <div className="max-w-6xl mx-auto">
+          <div className="mb-6 flex flex-wrap justify-between gap-3 text-sm font-semibold">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="rounded-lg bg-white px-4 py-2 text-gray-700 shadow-sm transition hover:bg-gray-50"
+            >
+              Trang ban đầu
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/pokemon')}
+              className="rounded-lg bg-blue-500 px-4 py-2 text-white shadow-sm transition hover:bg-blue-600"
+            >
+              Trang rút x10
+            </button>
+          </div>
+
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">🏆 Bảng Xếp Hạng</h1>
